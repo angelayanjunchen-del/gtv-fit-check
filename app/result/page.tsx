@@ -89,7 +89,7 @@ export default function ResultPage() {
               </span>
             </Badge>
             <h1 className="editorial-heading mt-5 text-3xl">
-              You haven't completed an assessment in this browser.
+              You haven&apos;t completed an assessment in this browser.
             </h1>
             <p className="mt-4 text-muted-foreground">
               Start the Arts & Culture self-assessment to generate a result, or

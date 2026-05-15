@@ -235,7 +235,7 @@ function StepProfile({ data, update }: StepProps) {
         <QuestionCard
           name="careerStage"
           label="Career stage"
-          hint="Roughly — there's no single definition. Pick the closest."
+          hint="Roughly — there&apos;s no single definition. Pick the closest."
           value={data.careerStage}
           onChange={(v) => update("careerStage", v as ArtsAssessment["careerStage"])}
           options={[

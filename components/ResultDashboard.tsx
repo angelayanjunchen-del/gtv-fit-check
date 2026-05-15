@@ -101,7 +101,7 @@ export function ResultDashboard({ result, onDownload }: ResultDashboardProps) {
           tone="success"
           eyebrow="Strengths"
           title="Areas that may support your case"
-          empty="We didn't identify clear strengths yet — keep building."
+          empty="We didn&apos;t identify clear strengths yet — keep building."
           items={result.strengths}
         />
         <SectionBlock

@@ -176,7 +176,7 @@ export default function LandingPage() {
             Honesty first.
           </h2>
           <p className="mt-5 text-balance text-muted-foreground">
-            We don't decide whether you'll be endorsed or approved. We help you
+            We don&apos;t decide whether you&apos;ll be endorsed or approved. We help you
             think clearly about your evidence before anyone else does.
           </p>
         </div>
