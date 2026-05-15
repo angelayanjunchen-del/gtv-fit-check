@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Warm off-white background */
+    --background: 36 30% 97%;
+    --foreground: 222 30% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 30% 12%;
+
+    --muted: 35 22% 94%;
+    --muted-foreground: 220 14% 42%;
+
+    --border: 30 18% 88%;
+    --input: 30 18% 88%;
+    --ring: 222 47% 18%;
+
+    /* Deep navy primary */
+    --primary: 222 47% 18%;
+    --primary-foreground: 40 30% 98%;
+
+    --secondary: 35 25% 92%;
+    --secondary-foreground: 222 30% 12%;
+
+    --accent: 30 25% 90%;
+    --accent-foreground: 222 30% 12%;
+
+    /* Muted gold */
+    --gold: 36 50% 50%;
+    --gold-foreground: 222 47% 12%;
+
+    --success: 152 36% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 36 70% 50%;
+    --warning-foreground: 222 30% 12%;
+
+    --destructive: 0 65% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --radius: 1rem;
+
+    --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial;
+    --font-serif: "Cormorant Garamond", ui-serif, Georgia, serif;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv01", "cv11";
+  }
+
+  ::selection {
+    background-color: hsl(var(--primary) / 0.15);
+    color: hsl(var(--primary));
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .bg-grain {
+    background-image: radial-gradient(
+        circle at 20% 20%,
+        hsl(var(--gold) / 0.08) 0%,
+        transparent 45%
+      ),
+      radial-gradient(
+        circle at 80% 0%,
+        hsl(var(--primary) / 0.06) 0%,
+        transparent 50%
+      );
+  }
+
+  .editorial-heading {
+    font-family: var(--font-serif);
+    letter-spacing: -0.015em;
+    font-weight: 500;
+  }
+
+  .number-display {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.04em;
+  }
+
+  .ring-soft {
+    box-shadow: 0 0 0 1px hsl(var(--border));
+  }
+}
