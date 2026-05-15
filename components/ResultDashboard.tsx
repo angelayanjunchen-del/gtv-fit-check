@@ -94,6 +94,32 @@ export function ResultDashboard({ result, onDownload }: ResultDashboardProps) {
         </div>
       </div>
 
+      {/* Evidence Builder CTA */}
+      <Card className="overflow-hidden border-primary/20 bg-primary/[0.03]">
+        <CardContent className="flex flex-col items-start gap-5 p-7 sm:flex-row sm:items-center sm:justify-between sm:p-8">
+          <div className="flex items-start gap-4">
+            <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-semibold tracking-tight">
+                Ready to build your evidence portfolio?
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Add your evidence items one by one. The Evidence Builder scores
+                each piece for strength, completeness and risk.
+              </p>
+            </div>
+          </div>
+          <Link href="/evidence" className="flex-shrink-0">
+            <Button className="gap-2">
+              Open Evidence Builder
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </Link>
+        </CardContent>
+      </Card>
+
       {/* Strengths + Gaps */}
       <div className="grid gap-5 lg:grid-cols-2">
         <SectionBlock

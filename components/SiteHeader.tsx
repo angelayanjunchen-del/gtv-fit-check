@@ -32,10 +32,16 @@ export function SiteHeader() {
             Assessment
           </Link>
           <Link
+            href="/evidence"
+            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Evidence Builder
+          </Link>
+          <Link
             href="/assessment/arts-culture"
             className="rounded-full bg-primary px-4 py-2 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
-            Start Arts & Culture
+            Start
           </Link>
         </nav>
       </div>
