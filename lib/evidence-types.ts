@@ -77,10 +77,27 @@ export interface EvidenceItem {
   linkOrUpload: string;
   applicantNameVisible: boolean | null;
   applicantRoleClear: boolean | null;
+  workTitleVisible: boolean | null;
+  wasCuratedOrSelected: boolean | null;
   withinLastFiveYears: boolean | null;
   hasThirdPartyProof: boolean | null;
   sourceAuthority: SourceAuthority | null;
   notes: string;
+
+  // Recommender-specific fields (only for recommendation-letter)
+  recommenderName: string;
+  recommenderRole: string;
+  recommenderIsSenior: boolean | null;
+  recommenderIsUkBased: boolean | null;
+  recommenderHasCollaborated: boolean | null;
+  recommenderCollaborationProject: string;
+  recommenderHasCredentials: boolean | null;
+  recommenderCanUseLetterhead: boolean | null;
+}
+
+export interface ItemSuggestion {
+  type: "missing" | "fix" | "tip";
+  text: string;
 }
 
 export interface EvidenceScoreBreakdown {
@@ -91,6 +108,7 @@ export interface EvidenceScoreBreakdown {
   documentation: number;       // 0..15
   total: number;               // 0..100
   risk: RiskLevel;
+  suggestions: ItemSuggestion[];
 }
 
 export interface CaseCoverage {
@@ -114,4 +132,6 @@ export interface CaseReadiness {
   risks: { title: string; description: string }[];
   nextActions: string[];
   suggestedPack: { slot: string; itemId: string | null; suggestion: string }[];
+  countryCoverage: { country: string; count: number }[];
+  narrative: string;
 }

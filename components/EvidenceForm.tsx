@@ -8,8 +8,11 @@ import {
   Building2,
   Link as LinkIcon,
   StickyNote,
+  User,
+  Briefcase,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,17 +39,39 @@ const DEFAULT: Omit<EvidenceItem, "id"> = {
   linkOrUpload: "",
   applicantNameVisible: null,
   applicantRoleClear: null,
+  workTitleVisible: null,
+  wasCuratedOrSelected: null,
   withinLastFiveYears: null,
   hasThirdPartyProof: null,
   sourceAuthority: null,
   notes: "",
+  recommenderName: "",
+  recommenderRole: "",
+  recommenderIsSenior: null,
+  recommenderIsUkBased: null,
+  recommenderHasCollaborated: null,
+  recommenderCollaborationProject: "",
+  recommenderHasCredentials: null,
+  recommenderCanUseLetterhead: null,
 };
+
+const BOOL_OPTIONS = [
+  { value: "yes", label: "Yes" },
+  { value: "no", label: "No" },
+];
 
 export function EvidenceForm({ onSubmit, onCancel }: EvidenceFormProps) {
   const [data, setData] = React.useState(DEFAULT);
+  const isLetter = data.category === "recommendation-letter";
 
   const set = <K extends keyof typeof data>(key: K, val: (typeof data)[K]) =>
     setData((prev) => ({ ...prev, [key]: val }));
+
+  const setBool = (key: keyof typeof data) => (v: string) =>
+    set(key, v === "yes" as never);
+
+  const boolVal = (v: boolean | null) =>
+    v === true ? "yes" : v === false ? "no" : null;
 
   const canSubmit =
     data.title.trim() !== "" &&
@@ -164,79 +189,186 @@ export function EvidenceForm({ onSubmit, onCancel }: EvidenceFormProps) {
         )}
       />
 
-      <div className="grid gap-6 sm:grid-cols-2">
-        <QuestionCard
-          name="nameVisible"
-          label="Is your name clearly visible?"
-          hint="Can someone see your full name in this evidence?"
-          value={
-            data.applicantNameVisible === true
-              ? "yes"
-              : data.applicantNameVisible === false
-                ? "no"
-                : null
-          }
-          onChange={(v) => set("applicantNameVisible", v === "yes")}
-          options={[
-            { value: "yes", label: "Yes" },
-            { value: "no", label: "No" },
-          ]}
-          layout="grid"
-        />
-        <QuestionCard
-          name="roleClear"
-          label="Is your role clear?"
-          hint="Is it obvious what you did — artist, performer, author?"
-          value={
-            data.applicantRoleClear === true
-              ? "yes"
-              : data.applicantRoleClear === false
-                ? "no"
-                : null
-          }
-          onChange={(v) => set("applicantRoleClear", v === "yes")}
-          options={[
-            { value: "yes", label: "Yes" },
-            { value: "no", label: "No" },
-          ]}
-          layout="grid"
-        />
+      {/* Verification questions */}
+      <Card>
+        <CardContent className="p-6 space-y-6">
+          <p className="text-xs uppercase tracking-wider text-muted-foreground">
+            Identity &amp; contribution proof
+          </p>
+
+          <div className="grid gap-6 sm:grid-cols-2">
+            <QuestionCard
+              name="nameVisible"
+              label="Is your name clearly visible?"
+              value={boolVal(data.applicantNameVisible)}
+              onChange={setBool("applicantNameVisible")}
+              options={BOOL_OPTIONS}
+              layout="grid"
+            />
+            <QuestionCard
+              name="roleClear"
+              label="Is your role clear?"
+              hint="Artist, performer, author, director..."
+              value={boolVal(data.applicantRoleClear)}
+              onChange={setBool("applicantRoleClear")}
+              options={BOOL_OPTIONS}
+              layout="grid"
+            />
+            <QuestionCard
+              name="workTitleVisible"
+              label="Is the work title shown?"
+              hint="Can someone see which specific work this refers to?"
+              value={boolVal(data.workTitleVisible)}
+              onChange={setBool("workTitleVisible")}
+              options={BOOL_OPTIONS}
+              layout="grid"
+            />
+            <QuestionCard
+              name="wasCurated"
+              label="Was this curated or selected?"
+              hint="Jury-selected, invited, or peer-reviewed?"
+              value={boolVal(data.wasCuratedOrSelected)}
+              onChange={setBool("wasCuratedOrSelected")}
+              options={BOOL_OPTIONS}
+              layout="grid"
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-6 sm:grid-cols-3">
         <QuestionCard
           name="lastFiveYears"
           label="Within the last 5 years?"
-          value={
-            data.withinLastFiveYears === true
-              ? "yes"
-              : data.withinLastFiveYears === false
-                ? "no"
-                : null
-          }
-          onChange={(v) => set("withinLastFiveYears", v === "yes")}
-          options={[
-            { value: "yes", label: "Yes" },
-            { value: "no", label: "No" },
-          ]}
+          value={boolVal(data.withinLastFiveYears)}
+          onChange={setBool("withinLastFiveYears")}
+          options={BOOL_OPTIONS}
           layout="grid"
         />
         <QuestionCard
           name="thirdParty"
           label="Independent third-party proof?"
-          hint="Is there verification from someone other than you?"
-          value={
-            data.hasThirdPartyProof === true
-              ? "yes"
-              : data.hasThirdPartyProof === false
-                ? "no"
-                : null
-          }
-          onChange={(v) => set("hasThirdPartyProof", v === "yes")}
-          options={[
-            { value: "yes", label: "Yes" },
-            { value: "no", label: "No" },
-          ]}
+          hint="External verification beyond your own records?"
+          value={boolVal(data.hasThirdPartyProof)}
+          onChange={setBool("hasThirdPartyProof")}
+          options={BOOL_OPTIONS}
           layout="grid"
         />
       </div>
+
+      {/* Recommender Evaluator — only for recommendation letters */}
+      {isLetter && (
+        <Card className="border-primary/20 bg-primary/[0.02]">
+          <CardContent className="p-6 space-y-5">
+            <div className="flex items-center gap-2">
+              <Badge variant="muted" className="gap-1.5">
+                <User className="h-3 w-3" />
+                <span className="text-[10px] uppercase tracking-wider">
+                  Recommender Evaluator
+                </span>
+              </Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Strong letters come from senior, internationally recognised
+              figures who have worked with you directly. At least one should
+              be UK-based.
+            </p>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="recName" className="flex items-center gap-1.5">
+                  <User className="h-3.5 w-3.5" />
+                  Recommender name
+                </Label>
+                <Input
+                  id="recName"
+                  placeholder="Full name"
+                  value={data.recommenderName}
+                  onChange={(e) => set("recommenderName", e.target.value)}
+                  className="mt-1.5"
+                />
+              </div>
+              <div>
+                <Label htmlFor="recRole" className="flex items-center gap-1.5">
+                  <Briefcase className="h-3.5 w-3.5" />
+                  Role / title
+                </Label>
+                <Input
+                  id="recRole"
+                  placeholder="e.g. Director, Curator, Professor"
+                  value={data.recommenderRole}
+                  onChange={(e) => set("recommenderRole", e.target.value)}
+                  className="mt-1.5"
+                />
+              </div>
+            </div>
+
+            <div className="grid gap-6 sm:grid-cols-2">
+              <QuestionCard
+                name="recSenior"
+                label="Is this person senior in the field?"
+                hint="Director, professor, established curator, etc."
+                value={boolVal(data.recommenderIsSenior)}
+                onChange={setBool("recommenderIsSenior")}
+                options={BOOL_OPTIONS}
+                layout="grid"
+              />
+              <QuestionCard
+                name="recUk"
+                label="Are they UK-based?"
+                hint="At least one letter should come from a UK organisation."
+                value={boolVal(data.recommenderIsUkBased)}
+                onChange={setBool("recommenderIsUkBased")}
+                options={BOOL_OPTIONS}
+                layout="grid"
+              />
+              <QuestionCard
+                name="recCollab"
+                label="Have they worked with you directly?"
+                value={boolVal(data.recommenderHasCollaborated)}
+                onChange={setBool("recommenderHasCollaborated")}
+                options={BOOL_OPTIONS}
+                layout="grid"
+              />
+              <QuestionCard
+                name="recCreds"
+                label="Can they provide a CV or bio?"
+                hint="To establish their own standing in the field."
+                value={boolVal(data.recommenderHasCredentials)}
+                onChange={setBool("recommenderHasCredentials")}
+                options={BOOL_OPTIONS}
+                layout="grid"
+              />
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div>
+                <Label htmlFor="recProject">
+                  Collaboration project (if applicable)
+                </Label>
+                <Input
+                  id="recProject"
+                  placeholder="e.g. Solo exhibition 2024"
+                  value={data.recommenderCollaborationProject}
+                  onChange={(e) =>
+                    set("recommenderCollaborationProject", e.target.value)
+                  }
+                  className="mt-1.5"
+                />
+              </div>
+              <QuestionCard
+                name="recLetterhead"
+                label="Can they use official letterhead?"
+                hint="Signed, dated, with contact details."
+                value={boolVal(data.recommenderCanUseLetterhead)}
+                onChange={setBool("recommenderCanUseLetterhead")}
+                options={BOOL_OPTIONS}
+                layout="grid"
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardContent className="p-6">

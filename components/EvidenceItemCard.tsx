@@ -137,6 +137,27 @@ export function EvidenceItemCard({
               </div>
             ))}
 
+            {score.suggestions.length > 0 && (
+              <div className="mt-3 space-y-1.5 border-t border-border/50 pt-3">
+                {score.suggestions.map((s, i) => (
+                  <div
+                    key={i}
+                    className={cn(
+                      "flex items-start gap-2 rounded-lg px-3 py-2 text-xs",
+                      s.type === "missing" && "bg-destructive/6 text-destructive",
+                      s.type === "fix" && "bg-warning/8 text-warning",
+                      s.type === "tip" && "bg-muted text-muted-foreground"
+                    )}
+                  >
+                    <span className="mt-0.5 font-semibold uppercase text-[10px] tracking-wider flex-shrink-0">
+                      {s.type === "missing" ? "Missing" : s.type === "fix" ? "Fix" : "Tip"}
+                    </span>
+                    <span className="leading-relaxed">{s.text}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {item.notes && (
               <p className="mt-3 text-xs text-muted-foreground italic border-t border-border/50 pt-3">
                 {item.notes}

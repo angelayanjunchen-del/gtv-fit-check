@@ -10,6 +10,8 @@ import {
   BarChart3,
   Sparkles,
   ArrowRight,
+  Globe,
+  FileText,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -160,6 +162,61 @@ export function EvidenceDashboard({
           empty="No significant risks surfaced yet."
           items={readiness.risks}
         />
+      </div>
+
+      {/* Case Narrative + Country Coverage */}
+      <div className="grid gap-5 lg:grid-cols-[2fr_1fr]">
+        <Card>
+          <CardContent className="p-7 sm:p-8">
+            <div className="flex items-center gap-2">
+              <FileText className="h-4 w-4 text-primary" />
+              <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                Case narrative diagnosis
+              </span>
+            </div>
+            <h3 className="editorial-heading mt-3 text-xl text-foreground sm:text-2xl">
+              How your evidence reads as a whole.
+            </h3>
+            <p className="mt-4 text-sm leading-relaxed text-foreground/85">
+              {readiness.narrative}
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-7">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
+              <Globe className="h-3.5 w-3.5" />
+              Country coverage
+            </div>
+            <div className="mt-4 flex items-end gap-2">
+              <span className="number-display text-3xl font-semibold text-foreground">
+                {readiness.countryCoverage.length}
+              </span>
+              <span className="mb-0.5 text-sm text-muted-foreground">
+                {readiness.countryCoverage.length === 1 ? "country" : "countries"}
+              </span>
+            </div>
+            <ul className="mt-4 space-y-1.5">
+              {readiness.countryCoverage.map((c) => (
+                <li
+                  key={c.country}
+                  className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2 text-xs"
+                >
+                  <span className="font-medium text-foreground">{c.country}</span>
+                  <span className="text-muted-foreground number-display">
+                    {c.count} item{c.count !== 1 ? "s" : ""}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            {readiness.countryCoverage.length < 2 && (
+              <p className="mt-3 text-xs text-warning">
+                Evidence from at least 2 countries is typically expected.
+              </p>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* Next actions */}

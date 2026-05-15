@@ -12,38 +12,38 @@ export function LandingHero() {
           <Badge variant="muted" className="gap-1.5 px-3 py-1">
             <Sparkles className="h-3 w-3 text-gold" />
             <span className="tracking-wide uppercase text-[10px] font-medium">
-              UK Global Talent Visa
+              UK Global Talent Visa · Arts &amp; Culture
             </span>
           </Badge>
 
           <h1 className="editorial-heading mt-8 text-balance text-4xl leading-[1.05] text-foreground sm:text-6xl md:text-7xl">
-            Find out if your work
+            Assess your fit.
             <br />
             <span className="italic text-primary/85">
-              fits the Global Talent route.
+              Build a stronger evidence case.
             </span>
           </h1>
 
           <p className="mt-7 max-w-2xl text-balance text-base leading-relaxed text-muted-foreground sm:text-lg">
-            A calm, intelligent self-assessment for artists, creative
-            professionals, founders and researchers. Map your evidence, surface
-            your gaps, and plan what to prepare next — in around five minutes.
+            A guided tool for artists and creative professionals to map
+            achievements, evaluate each piece of evidence for strength and
+            risk, identify gaps, and prepare a clearer Arts &amp; Culture
+            endorsement case.
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
             <Link href="/assessment">
-              <CTAButton>Start self-assessment</CTAButton>
+              <CTAButton>Start your assessment</CTAButton>
             </Link>
-            <Link
-              href="#how-it-works"
-              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
-            >
-              How it works ↓
+            <Link href="/evidence">
+              <CTAButton variant="outline" withArrow={false}>
+                Open Evidence Builder
+              </CTAButton>
             </Link>
           </div>
 
           <p className="mt-6 text-xs text-muted-foreground">
-            No sign-up required · Free demo · Results are educational only
+            No sign-up required · Free demo · Educational only · Not legal advice
           </p>
         </div>
       </div>
