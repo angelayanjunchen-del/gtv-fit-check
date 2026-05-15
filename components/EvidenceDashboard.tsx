@@ -8,7 +8,6 @@ import {
   Package,
   Mail,
   BarChart3,
-  Sparkles,
   ArrowRight,
   Globe,
   FileText,

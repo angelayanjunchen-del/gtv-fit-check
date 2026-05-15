@@ -105,7 +105,6 @@ export function scoreEvidence(item: EvidenceItem): EvidenceScoreBreakdown {
     documentation: Math.max(0, documentation),
     total,
     risk,
-    suggestions: [],
   });
 
   return {
