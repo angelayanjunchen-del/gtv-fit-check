@@ -67,8 +67,16 @@ export const RISK_DESCRIPTIONS: Record<RiskLevel, string> = {
     "A qualified adviser should review this item before relying on it.",
 };
 
+export type EvidenceStatus = "done" | "intent";
+
+export const STATUS_LABELS: Record<EvidenceStatus, string> = {
+  done: "已有 · Have",
+  intent: "意向 · Plan",
+};
+
 export interface EvidenceItem {
   id: string;
+  status: EvidenceStatus;
   category: EvidenceCategory;
   title: string;
   organisation: string;
@@ -134,4 +142,5 @@ export interface CaseReadiness {
   suggestedPack: { slot: string; itemId: string | null; suggestion: string }[];
   countryCoverage: { country: string; count: number }[];
   narrative: string;
+  intentCount: number;
 }

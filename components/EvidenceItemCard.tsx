@@ -46,19 +46,28 @@ export function EvidenceItemCard({
     <Card
       className={cn(
         "group relative overflow-hidden transition-all duration-200",
-        score.risk === "strong" && "border-success/30",
-        score.risk === "weak" && "border-destructive/30",
-        score.risk === "needs-review" && "border-muted-foreground/30"
+        item.status === "intent" && "border-dashed border-gold/40",
+        item.status === "done" && score.risk === "strong" && "border-success/30",
+        item.status === "done" && score.risk === "weak" && "border-destructive/30",
+        item.status === "done" && score.risk === "needs-review" && "border-muted-foreground/30"
       )}
     >
       <CardContent className="p-5 sm:p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <Badge variant="muted" className="text-[10px] uppercase tracking-wider">
-                {EVIDENCE_CATEGORY_SHORT[item.category]}
+              <Badge
+                variant={item.status === "intent" ? "gold" : "muted"}
+                className="text-[10px] uppercase tracking-wider"
+              >
+                {item.status === "intent" ? "Intent" : EVIDENCE_CATEGORY_SHORT[item.category]}
               </Badge>
-              <RiskBadge risk={score.risk} />
+              {item.status === "done" && <RiskBadge risk={score.risk} />}
+              {item.status === "intent" && (
+                <Badge variant="muted" className="text-[10px] uppercase tracking-wider">
+                  {EVIDENCE_CATEGORY_SHORT[item.category]}
+                </Badge>
+              )}
             </div>
 
             <h3 className="mt-3 text-base font-semibold tracking-tight text-foreground line-clamp-2">

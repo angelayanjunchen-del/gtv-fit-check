@@ -11,9 +11,13 @@ const REC_DEFAULTS = {
   recommenderCanUseLetterhead: null as boolean | null,
 };
 
+const DONE = "done" as const;
+const INTENT = "intent" as const;
+
 export const MOCK_EVIDENCE: EvidenceItem[] = [
   {
     id: "ev-001",
+    status: DONE,
     category: "media-recognition",
     title: "Feature interview on contemporary painting practice",
     organisation: "The Guardian",
@@ -32,6 +36,7 @@ export const MOCK_EVIDENCE: EvidenceItem[] = [
   },
   {
     id: "ev-002",
+    status: DONE,
     category: "media-recognition",
     title: "Solo show review in Frieze magazine",
     organisation: "Frieze",
@@ -50,6 +55,7 @@ export const MOCK_EVIDENCE: EvidenceItem[] = [
   },
   {
     id: "ev-003",
+    status: DONE,
     category: "media-recognition",
     title: "Blog post by independent curator",
     organisation: "Personal blog",
@@ -68,6 +74,7 @@ export const MOCK_EVIDENCE: EvidenceItem[] = [
   },
   {
     id: "ev-004",
+    status: DONE,
     category: "prize-nomination",
     title: "Shortlisted for the Max Mara Art Prize for Women",
     organisation: "Whitechapel Gallery / Max Mara",
@@ -86,6 +93,7 @@ export const MOCK_EVIDENCE: EvidenceItem[] = [
   },
   {
     id: "ev-005",
+    status: DONE,
     category: "prize-nomination",
     title: "Winner, local emerging artist award",
     organisation: "City Arts Council",
@@ -104,6 +112,7 @@ export const MOCK_EVIDENCE: EvidenceItem[] = [
   },
   {
     id: "ev-006",
+    status: DONE,
     category: "exhibition-performance",
     title: "Solo exhibition: Tate Modern Project Space",
     organisation: "Tate Modern",
@@ -122,6 +131,7 @@ export const MOCK_EVIDENCE: EvidenceItem[] = [
   },
   {
     id: "ev-007",
+    status: DONE,
     category: "exhibition-performance",
     title: "Group show at Art Basel (Unlimited section)",
     organisation: "Art Basel",
@@ -140,6 +150,7 @@ export const MOCK_EVIDENCE: EvidenceItem[] = [
   },
   {
     id: "ev-008",
+    status: DONE,
     category: "exhibition-performance",
     title: "MFA degree show",
     organisation: "University of the Arts London",
@@ -158,6 +169,7 @@ export const MOCK_EVIDENCE: EvidenceItem[] = [
   },
   {
     id: "ev-009",
+    status: INTENT,
     category: "exhibition-performance",
     title: "Community art fair table",
     organisation: "Hackney Art Trail",
@@ -176,6 +188,7 @@ export const MOCK_EVIDENCE: EvidenceItem[] = [
   },
   {
     id: "ev-010",
+    status: DONE,
     category: "recommendation-letter",
     title: "Letter from Director of Serpentine Galleries",
     organisation: "Serpentine Galleries",
@@ -201,6 +214,7 @@ export const MOCK_EVIDENCE: EvidenceItem[] = [
   },
   {
     id: "ev-011",
+    status: DONE,
     category: "recommendation-letter",
     title: "Letter from university tutor",
     organisation: "University of the Arts London",
@@ -226,6 +240,7 @@ export const MOCK_EVIDENCE: EvidenceItem[] = [
   },
   {
     id: "ev-012",
+    status: DONE,
     category: "recommendation-letter",
     title: "Letter from international collector",
     organisation: "Independent",
@@ -251,6 +266,7 @@ export const MOCK_EVIDENCE: EvidenceItem[] = [
   },
   {
     id: "ev-013",
+    status: DONE,
     category: "cv-career-record",
     title: "Artist CV (3-page, tailored for GTV)",
     organisation: "Self",
@@ -269,6 +285,7 @@ export const MOCK_EVIDENCE: EvidenceItem[] = [
   },
   {
     id: "ev-014",
+    status: INTENT,
     category: "other-supporting",
     title: "Screenshot of personal website portfolio",
     organisation: "Personal website",

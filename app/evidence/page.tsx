@@ -25,7 +25,11 @@ function loadItems(): EvidenceItem[] {
   const raw = window.localStorage.getItem(STORAGE_KEY);
   if (raw) {
     try {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(raw) as EvidenceItem[];
+      return parsed.map((item) => ({
+        ...item,
+        status: item.status || "done",
+      }));
     } catch {
       /* ignore */
     }
@@ -64,9 +68,11 @@ export default function EvidenceListPage() {
     score: scoreEvidence(item),
   }));
 
-  const strongCount = scored.filter((s) => s.score.risk === "strong").length;
+  const doneCount = items.filter((i) => i.status === "done").length;
+  const intentCount = items.filter((i) => i.status === "intent").length;
+  const strongCount = scored.filter((s) => s.item.status === "done" && s.score.risk === "strong").length;
   const weakCount = scored.filter(
-    (s) => s.score.risk === "weak" || s.score.risk === "needs-review"
+    (s) => s.item.status === "done" && (s.score.risk === "weak" || s.score.risk === "needs-review")
   ).length;
 
   if (!loaded) {
@@ -135,7 +141,10 @@ export default function EvidenceListPage() {
       {/* Stats strip */}
       {items.length > 0 && (
         <div className="mt-6 flex flex-wrap gap-4">
-          <MiniStat icon={<Layers className="h-3.5 w-3.5" />} label="Total items" value={items.length} />
+          <MiniStat icon={<Layers className="h-3.5 w-3.5" />} label="Have" value={doneCount} />
+          {intentCount > 0 && (
+            <MiniStat icon={<Layers className="h-3.5 w-3.5 text-gold" />} label="Intent" value={intentCount} />
+          )}
           <MiniStat icon={<BarChart3 className="h-3.5 w-3.5 text-success" />} label="Strong" value={strongCount} />
           {weakCount > 0 && (
             <MiniStat icon={<BarChart3 className="h-3.5 w-3.5 text-destructive" />} label="Risky" value={weakCount} />

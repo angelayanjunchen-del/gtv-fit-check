@@ -2,26 +2,23 @@
 
 import * as React from "react";
 import {
-  FileText,
   Globe,
-  Calendar,
-  Building2,
   Link as LinkIcon,
-  StickyNote,
   User,
   Briefcase,
+  FileText,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { QuestionCard } from "@/components/QuestionCard";
+import { cn } from "@/lib/utils";
 import {
   EVIDENCE_CATEGORY_LABELS,
   SOURCE_AUTHORITY_LABELS,
   type EvidenceCategory,
   type EvidenceItem,
+  type EvidenceStatus,
   type SourceAuthority,
 } from "@/lib/evidence-types";
 
@@ -30,368 +27,321 @@ interface EvidenceFormProps {
   onCancel: () => void;
 }
 
-const DEFAULT: Omit<EvidenceItem, "id"> = {
-  category: "media-recognition",
-  title: "",
-  organisation: "",
-  country: "",
-  date: "",
-  linkOrUpload: "",
-  applicantNameVisible: null,
-  applicantRoleClear: null,
-  workTitleVisible: null,
-  wasCuratedOrSelected: null,
-  withinLastFiveYears: null,
-  hasThirdPartyProof: null,
-  sourceAuthority: null,
-  notes: "",
-  recommenderName: "",
-  recommenderRole: "",
-  recommenderIsSenior: null,
-  recommenderIsUkBased: null,
-  recommenderHasCollaborated: null,
-  recommenderCollaborationProject: "",
-  recommenderHasCredentials: null,
-  recommenderCanUseLetterhead: null,
-};
-
-const BOOL_OPTIONS = [
-  { value: "yes", label: "Yes" },
-  { value: "no", label: "No" },
+const CATEGORY_OPTIONS: { value: EvidenceCategory; label: string; sub: string }[] = [
+  { value: "media-recognition", label: "Media", sub: "Press / review / interview" },
+  { value: "prize-nomination", label: "Prize", sub: "Award / nomination / grant" },
+  { value: "exhibition-performance", label: "Show", sub: "Exhibition / performance" },
+  { value: "recommendation-letter", label: "Referee", sub: "Recommendation letter" },
+  { value: "cv-career-record", label: "CV", sub: "Career record" },
+  { value: "other-supporting", label: "Other", sub: "Supporting material" },
 ];
 
 export function EvidenceForm({ onSubmit, onCancel }: EvidenceFormProps) {
-  const [data, setData] = React.useState(DEFAULT);
-  const isLetter = data.category === "recommendation-letter";
+  const [status, setStatus] = React.useState<EvidenceStatus>("done");
+  const [category, setCategory] = React.useState<EvidenceCategory>("media-recognition");
+  const [url, setUrl] = React.useState("");
+  const [title, setTitle] = React.useState("");
+  const [org, setOrg] = React.useState("");
+  const [country, setCountry] = React.useState("");
+  const [notes, setNotes] = React.useState("");
+  const [sourceAuthority, setSourceAuthority] = React.useState<SourceAuthority | null>(null);
 
-  const set = <K extends keyof typeof data>(key: K, val: (typeof data)[K]) =>
-    setData((prev) => ({ ...prev, [key]: val }));
+  const [recName, setRecName] = React.useState("");
+  const [recRole, setRecRole] = React.useState("");
+  const [recRelation, setRecRelation] = React.useState("");
 
-  const setBool = (key: keyof typeof data) => (v: string) =>
-    set(key, v === "yes" as never);
+  const isLetter = category === "recommendation-letter";
 
-  const boolVal = (v: boolean | null) =>
-    v === true ? "yes" : v === false ? "no" : null;
-
-  const canSubmit =
-    data.title.trim() !== "" &&
-    data.organisation.trim() !== "" &&
-    data.country.trim() !== "" &&
-    data.sourceAuthority !== null;
+  const canSubmit = isLetter
+    ? recName.trim() !== ""
+    : url.trim() !== "" || title.trim() !== "";
 
   const handleSubmit = () => {
     if (!canSubmit) return;
-    onSubmit({
-      ...data,
+
+    const item: EvidenceItem = {
       id: `ev-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-    });
+      status,
+      category,
+      title: isLetter ? `Letter from ${recName}` : title,
+      organisation: isLetter ? org : org,
+      country,
+      date: "",
+      linkOrUpload: url,
+      applicantNameVisible: null,
+      applicantRoleClear: null,
+      workTitleVisible: null,
+      wasCuratedOrSelected: null,
+      withinLastFiveYears: null,
+      hasThirdPartyProof: url ? true : null,
+      sourceAuthority,
+      notes: isLetter ? recRelation : notes,
+      recommenderName: isLetter ? recName : "",
+      recommenderRole: isLetter ? recRole : "",
+      recommenderIsSenior: null,
+      recommenderIsUkBased: null,
+      recommenderHasCollaborated: recRelation ? true : null,
+      recommenderCollaborationProject: isLetter ? recRelation : "",
+      recommenderHasCredentials: null,
+      recommenderCanUseLetterhead: null,
+    };
+    onSubmit(item);
   };
 
   return (
-    <div className="space-y-6">
-      <QuestionCard
-        name="category"
-        label="Evidence type"
-        hint="What kind of evidence is this?"
-        value={data.category}
-        onChange={(v) => set("category", v as EvidenceCategory)}
-        options={Object.entries(EVIDENCE_CATEGORY_LABELS).map(
-          ([value, label]) => ({ value, label })
-        )}
-      />
-
-      <Card>
-        <CardContent className="p-6 space-y-5">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-            <FileText className="h-3.5 w-3.5" />
-            Details
-          </p>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                placeholder='e.g. "Solo exhibition at Tate Modern"'
-                value={data.title}
-                onChange={(e) => set("title", e.target.value)}
-                className="mt-1.5"
-              />
-            </div>
-            <div>
-              <Label htmlFor="organisation" className="flex items-center gap-1.5">
-                <Building2 className="h-3.5 w-3.5" />
-                Organisation / institution
-              </Label>
-              <Input
-                id="organisation"
-                placeholder="e.g. Tate Modern"
-                value={data.organisation}
-                onChange={(e) => set("organisation", e.target.value)}
-                className="mt-1.5"
-              />
-            </div>
-            <div>
-              <Label htmlFor="country" className="flex items-center gap-1.5">
-                <Globe className="h-3.5 w-3.5" />
-                Country
-              </Label>
-              <Input
-                id="country"
-                placeholder="e.g. United Kingdom"
-                value={data.country}
-                onChange={(e) => set("country", e.target.value)}
-                className="mt-1.5"
-              />
-            </div>
-            <div>
-              <Label htmlFor="date" className="flex items-center gap-1.5">
-                <Calendar className="h-3.5 w-3.5" />
-                Date (approximate)
-              </Label>
-              <Input
-                id="date"
-                placeholder="e.g. 2024-06"
-                value={data.date}
-                onChange={(e) => set("date", e.target.value)}
-                className="mt-1.5"
-              />
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="link" className="flex items-center gap-1.5">
-              <LinkIcon className="h-3.5 w-3.5" />
-              Link or upload reference
-            </Label>
-            <Input
-              id="link"
-              placeholder="https://... or filename.pdf"
-              value={data.linkOrUpload}
-              onChange={(e) => set("linkOrUpload", e.target.value)}
-              className="mt-1.5"
-            />
-            <p className="mt-1 text-xs text-muted-foreground">
-              Paste a URL or describe the file you would attach.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      <QuestionCard
-        name="sourceAuthority"
-        label="Source authority"
-        hint="How would you classify this source?"
-        value={data.sourceAuthority}
-        onChange={(v) => set("sourceAuthority", v as SourceAuthority)}
-        options={Object.entries(SOURCE_AUTHORITY_LABELS).map(
-          ([value, label]) => ({ value, label })
-        )}
-      />
-
-      {/* Verification questions */}
-      <Card>
-        <CardContent className="p-6 space-y-6">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">
-            Identity &amp; contribution proof
-          </p>
-
-          <div className="grid gap-6 sm:grid-cols-2">
-            <QuestionCard
-              name="nameVisible"
-              label="Is your name clearly visible?"
-              value={boolVal(data.applicantNameVisible)}
-              onChange={setBool("applicantNameVisible")}
-              options={BOOL_OPTIONS}
-              layout="grid"
-            />
-            <QuestionCard
-              name="roleClear"
-              label="Is your role clear?"
-              hint="Artist, performer, author, director..."
-              value={boolVal(data.applicantRoleClear)}
-              onChange={setBool("applicantRoleClear")}
-              options={BOOL_OPTIONS}
-              layout="grid"
-            />
-            <QuestionCard
-              name="workTitleVisible"
-              label="Is the work title shown?"
-              hint="Can someone see which specific work this refers to?"
-              value={boolVal(data.workTitleVisible)}
-              onChange={setBool("workTitleVisible")}
-              options={BOOL_OPTIONS}
-              layout="grid"
-            />
-            <QuestionCard
-              name="wasCurated"
-              label="Was this curated or selected?"
-              hint="Jury-selected, invited, or peer-reviewed?"
-              value={boolVal(data.wasCuratedOrSelected)}
-              onChange={setBool("wasCuratedOrSelected")}
-              options={BOOL_OPTIONS}
-              layout="grid"
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="grid gap-6 sm:grid-cols-3">
-        <QuestionCard
-          name="lastFiveYears"
-          label="Within the last 5 years?"
-          value={boolVal(data.withinLastFiveYears)}
-          onChange={setBool("withinLastFiveYears")}
-          options={BOOL_OPTIONS}
-          layout="grid"
-        />
-        <QuestionCard
-          name="thirdParty"
-          label="Independent third-party proof?"
-          hint="External verification beyond your own records?"
-          value={boolVal(data.hasThirdPartyProof)}
-          onChange={setBool("hasThirdPartyProof")}
-          options={BOOL_OPTIONS}
-          layout="grid"
-        />
+    <div className="space-y-5">
+      {/* Status toggle */}
+      <div className="flex overflow-hidden rounded-xl border border-border">
+        <button
+          type="button"
+          onClick={() => setStatus("done")}
+          className={cn(
+            "flex-1 py-4 text-center text-sm font-semibold transition-colors",
+            status === "done"
+              ? "bg-foreground text-background"
+              : "bg-card text-muted-foreground hover:bg-muted/50"
+          )}
+        >
+          <span className="block text-base">已有</span>
+          <span className="mt-0.5 block text-[10px] uppercase tracking-wider opacity-70">
+            Already happened
+          </span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setStatus("intent")}
+          className={cn(
+            "flex-1 border-l border-border py-4 text-center text-sm font-semibold transition-colors",
+            status === "intent"
+              ? "bg-foreground text-gold"
+              : "bg-card text-muted-foreground hover:bg-muted/50"
+          )}
+        >
+          <span className="block text-base">意向</span>
+          <span className="mt-0.5 block text-[10px] uppercase tracking-wider opacity-70">
+            Future target
+          </span>
+        </button>
       </div>
 
-      {/* Recommender Evaluator — only for recommendation letters */}
-      {isLetter && (
-        <Card className="border-primary/20 bg-primary/[0.02]">
-          <CardContent className="p-6 space-y-5">
-            <div className="flex items-center gap-2">
-              <Badge variant="muted" className="gap-1.5">
-                <User className="h-3 w-3" />
-                <span className="text-[10px] uppercase tracking-wider">
-                  Recommender Evaluator
-                </span>
-              </Badge>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Strong letters come from senior, internationally recognised
-              figures who have worked with you directly. At least one should
-              be UK-based.
-            </p>
+      <p className="text-xs text-muted-foreground">
+        {status === "done"
+          ? "Fill in details of evidence you already have. The system evaluates its strength against ACE criteria."
+          : "Describe evidence you plan to get in the next 3–6 months. The system checks if the target meets ACE standards."}
+      </p>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+      {/* Category */}
+      <div className="grid grid-cols-3 gap-0 overflow-hidden rounded-xl border border-border sm:grid-cols-6">
+        {CATEGORY_OPTIONS.map((opt) => (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => setCategory(opt.value)}
+            className={cn(
+              "border-r border-b border-border px-3 py-3.5 text-left transition-colors last:border-r-0 sm:[&:nth-child(6)]:border-r-0",
+              category === opt.value
+                ? "bg-foreground text-background"
+                : "bg-card hover:bg-muted/50"
+            )}
+          >
+            <span className="block text-xs font-bold">{opt.label}</span>
+            <span className={cn(
+              "mt-0.5 block text-[9px] uppercase tracking-wider",
+              category === opt.value ? "opacity-60" : "text-muted-foreground"
+            )}>
+              {opt.sub}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Form fields */}
+      <Card>
+        <CardContent className="space-y-4 p-5">
+          {isLetter ? (
+            <>
               <div>
-                <Label htmlFor="recName" className="flex items-center gap-1.5">
-                  <User className="h-3.5 w-3.5" />
-                  Recommender name
+                <Label htmlFor="recName" className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground">
+                  <User className="h-3 w-3" />
+                  {status === "done" ? "Recommender name" : "Target recommender"} *
                 </Label>
                 <Input
                   id="recName"
-                  placeholder="Full name"
-                  value={data.recommenderName}
-                  onChange={(e) => set("recommenderName", e.target.value)}
+                  placeholder={status === "done" ? "Dr. Sarah Wilson" : "e.g. Senior Curator at Whitechapel"}
+                  value={recName}
+                  onChange={(e) => setRecName(e.target.value)}
                   className="mt-1.5"
                 />
               </div>
               <div>
-                <Label htmlFor="recRole" className="flex items-center gap-1.5">
-                  <Briefcase className="h-3.5 w-3.5" />
-                  Role / title
+                <Label htmlFor="recRole" className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground">
+                  <Briefcase className="h-3 w-3" />
+                  Role + institution
                 </Label>
                 <Input
                   id="recRole"
-                  placeholder="e.g. Director, Curator, Professor"
-                  value={data.recommenderRole}
-                  onChange={(e) => set("recommenderRole", e.target.value)}
+                  placeholder="e.g. Director, Serpentine Galleries"
+                  value={recRole}
+                  onChange={(e) => setRecRole(e.target.value)}
                   className="mt-1.5"
                 />
               </div>
-            </div>
-
-            <div className="grid gap-6 sm:grid-cols-2">
-              <QuestionCard
-                name="recSenior"
-                label="Is this person senior in the field?"
-                hint="Director, professor, established curator, etc."
-                value={boolVal(data.recommenderIsSenior)}
-                onChange={setBool("recommenderIsSenior")}
-                options={BOOL_OPTIONS}
-                layout="grid"
-              />
-              <QuestionCard
-                name="recUk"
-                label="Are they UK-based?"
-                hint="At least one letter should come from a UK organisation."
-                value={boolVal(data.recommenderIsUkBased)}
-                onChange={setBool("recommenderIsUkBased")}
-                options={BOOL_OPTIONS}
-                layout="grid"
-              />
-              <QuestionCard
-                name="recCollab"
-                label="Have they worked with you directly?"
-                value={boolVal(data.recommenderHasCollaborated)}
-                onChange={setBool("recommenderHasCollaborated")}
-                options={BOOL_OPTIONS}
-                layout="grid"
-              />
-              <QuestionCard
-                name="recCreds"
-                label="Can they provide a CV or bio?"
-                hint="To establish their own standing in the field."
-                value={boolVal(data.recommenderHasCredentials)}
-                onChange={setBool("recommenderHasCredentials")}
-                options={BOOL_OPTIONS}
-                layout="grid"
-              />
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <Label htmlFor="recProject">
-                  Collaboration project (if applicable)
+                <Label htmlFor="recUrl" className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground">
+                  <LinkIcon className="h-3 w-3" />
+                  Profile link
                 </Label>
                 <Input
-                  id="recProject"
-                  placeholder="e.g. Solo exhibition 2024"
-                  value={data.recommenderCollaborationProject}
-                  onChange={(e) =>
-                    set("recommenderCollaborationProject", e.target.value)
-                  }
+                  id="recUrl"
+                  placeholder="https://institution.org/person or LinkedIn"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
                   className="mt-1.5"
                 />
               </div>
-              <QuestionCard
-                name="recLetterhead"
-                label="Can they use official letterhead?"
-                hint="Signed, dated, with contact details."
-                value={boolVal(data.recommenderCanUseLetterhead)}
-                onChange={setBool("recommenderCanUseLetterhead")}
-                options={BOOL_OPTIONS}
-                layout="grid"
-              />
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <Card>
-        <CardContent className="p-6">
-          <Label htmlFor="notes" className="flex items-center gap-1.5">
-            <StickyNote className="h-3.5 w-3.5" />
-            Notes (optional)
-          </Label>
-          <textarea
-            id="notes"
-            className="mt-1.5 flex min-h-[80px] w-full rounded-xl border border-input bg-background px-4 py-3 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-y"
-            placeholder="Any context that helps evaluate this evidence..."
-            value={data.notes}
-            onChange={(e) => set("notes", e.target.value)}
-          />
+              <div>
+                <Label htmlFor="recRelation" className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground">
+                  <FileText className="h-3 w-3" />
+                  {status === "done" ? "Relationship / projects together" : "How you plan to connect"}
+                </Label>
+                <textarea
+                  id="recRelation"
+                  className="mt-1.5 flex min-h-[72px] w-full rounded-xl border border-input bg-background px-4 py-3 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-y"
+                  placeholder={status === "done"
+                    ? "e.g. Curated my solo show in 2024, selected 3 works"
+                    : "e.g. Plan to apply for their residency programme"
+                  }
+                  value={recRelation}
+                  onChange={(e) => setRecRelation(e.target.value)}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <Label htmlFor="url" className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground">
+                  <LinkIcon className="h-3 w-3" />
+                  Link *
+                </Label>
+                <Input
+                  id="url"
+                  placeholder={status === "done"
+                    ? "https://... paste the article, listing, or announcement"
+                    : "https://... link to the target venue, prize, or publication"
+                  }
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  className="mt-1.5"
+                />
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  {status === "done"
+                    ? "The link is how strength and authority get verified."
+                    : "Link to the target so the system can check if it meets ACE standards."}
+                </p>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="title" className="text-xs uppercase tracking-wider text-muted-foreground">
+                    Title / description
+                  </Label>
+                  <Input
+                    id="title"
+                    placeholder={
+                      category === "media-recognition" ? "e.g. Solo show review in Frieze" :
+                      category === "prize-nomination" ? "e.g. Max Mara Art Prize shortlist" :
+                      category === "exhibition-performance" ? "e.g. Solo exhibition at Tate Modern" :
+                      "e.g. Artist CV, 3 pages"
+                    }
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="mt-1.5"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="org" className="text-xs uppercase tracking-wider text-muted-foreground">
+                    Organisation
+                  </Label>
+                  <Input
+                    id="org"
+                    placeholder="e.g. Tate Modern, Frieze, Art Basel"
+                    value={org}
+                    onChange={(e) => setOrg(e.target.value)}
+                    className="mt-1.5"
+                  />
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="country" className="flex items-center gap-1.5 text-xs uppercase tracking-wider text-muted-foreground">
+                    <Globe className="h-3 w-3" />
+                    Country
+                  </Label>
+                  <Input
+                    id="country"
+                    placeholder="e.g. United Kingdom"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="mt-1.5"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs uppercase tracking-wider text-muted-foreground">
+                    Source authority
+                  </Label>
+                  <div className="mt-1.5 grid grid-cols-2 gap-0 overflow-hidden rounded-lg border border-border text-[10px]">
+                    {(Object.entries(SOURCE_AUTHORITY_LABELS) as [SourceAuthority, string][]).slice(0, 4).map(([val, label]) => (
+                      <button
+                        key={val}
+                        type="button"
+                        onClick={() => setSourceAuthority(val)}
+                        className={cn(
+                          "border-r border-b border-border px-2 py-2 text-left transition-colors",
+                          sourceAuthority === val
+                            ? "bg-foreground text-background font-medium"
+                            : "hover:bg-muted/50"
+                        )}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="notes" className="text-xs uppercase tracking-wider text-muted-foreground">
+                  Notes
+                </Label>
+                <textarea
+                  id="notes"
+                  className="mt-1.5 flex min-h-[60px] w-full rounded-xl border border-input bg-background px-4 py-3 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-y"
+                  placeholder={status === "done"
+                    ? "Any context that helps evaluate this evidence..."
+                    : "Your plan — timeline, contacts, how you intend to get this..."
+                  }
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                />
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
+
+      {/* Status hint */}
+      {status === "intent" && (
+        <div className="rounded-xl border border-gold/30 bg-gold/8 px-4 py-3 text-xs text-foreground/80">
+          <span className="font-semibold">Intent items</span> are scored
+          differently &mdash; they show whether your target meets ACE standards,
+          not whether you have the evidence yet.
+        </div>
+      )}
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Button variant="ghost" onClick={onCancel}>
           Cancel
         </Button>
         <Button onClick={handleSubmit} disabled={!canSubmit} size="lg">
-          Add evidence item
+          {status === "done" ? "Add evidence" : "Add target"}
         </Button>
       </div>
     </div>

@@ -120,6 +120,11 @@ export function scoreEvidence(item: EvidenceItem): EvidenceScoreBreakdown {
 }
 
 function riskFromScore(score: number, item: EvidenceItem): RiskLevel {
+  if (item.status === "intent") {
+    if (score >= 60) return "strong";
+    if (score >= 40) return "usable";
+    return "needs-review";
+  }
   if (item.sourceAuthority === "self-published") return "weak";
   if (
     item.applicantNameVisible === false &&
@@ -360,6 +365,8 @@ export function buildCaseReadiness(items: EvidenceItem[]): CaseReadiness {
     tier
   );
 
+  const intentCount = items.filter((i) => i.status === "intent").length;
+
   return {
     overallScore,
     tier,
@@ -371,6 +378,7 @@ export function buildCaseReadiness(items: EvidenceItem[]): CaseReadiness {
     suggestedPack,
     countryCoverage,
     narrative,
+    intentCount,
   };
 }
 

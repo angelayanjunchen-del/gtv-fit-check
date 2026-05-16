@@ -25,7 +25,8 @@ export default function EvidenceDashboardPage() {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
       try {
-        data = JSON.parse(raw);
+        const parsed = JSON.parse(raw) as EvidenceItem[];
+        data = parsed.map((item) => ({ ...item, status: item.status || "done" }));
       } catch {
         /* ignore */
       }

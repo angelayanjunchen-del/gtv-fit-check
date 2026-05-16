@@ -49,6 +49,11 @@ export function EvidenceDashboard({
               <Badge variant="muted" className="text-[10px] uppercase tracking-wider">
                 {totalItems} item{totalItems !== 1 ? "s" : ""}
               </Badge>
+              {readiness.intentCount > 0 && (
+                <Badge variant="gold" className="text-[10px] uppercase tracking-wider">
+                  {readiness.intentCount} intent
+                </Badge>
+              )}
             </div>
 
             <h1 className="editorial-heading mt-6 text-balance text-3xl leading-tight sm:text-4xl lg:text-5xl">
